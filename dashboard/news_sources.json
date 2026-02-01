@@ -1,0 +1,38 @@
+[
+  {
+    "name": "Zonguldak Haber",
+    "rss": "https://www.zonguldakhaber.com/rss.xml"
+  },
+  {
+    "name": "Elmas Televizyonu",
+    "rss": "https://www.elmas67.com/rss/"
+  },
+  {
+    "name": "Kanal B Zonguldak",
+    "rss": "https://www.kanalbzonguldak.com/rss"
+  },
+  {
+    "name": "Tempo Gazetesi",
+    "rss": "https://www.tempogazetesi.com/rss"
+  },
+  {
+    "name": "Yeni Adım Gazetesi",
+    "rss": "https://www.yeniadimgazetesi.com/rss"
+  },
+  {
+    "name": "Z Haber",
+    "rss": "https://www.zhaber.com.tr/rss"
+  },
+  {
+    "name": "İmza Gazetesi",
+    "rss": "https://www.imzagazetesi.com/rss/"
+  },
+  {
+    "name": "Haberci 67",
+    "rss": "https://www.haberci67.com/rss.xml"
+  },
+  {
+    "name": "Pusula Gazetesi",
+    "rss": "https://www.pusulagazetesi.com.tr/rss.xml"
+  }
+]
