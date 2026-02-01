@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Zonguldak Haber Paneli</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Zonguldak Haber Paneli</h1>
+      <p>Windows üzerinden haber kaynaklarını ve güncel başlıkları takip edin.</p>
+      <button id="refreshButton">Yenile</button>
+      <span id="statusText">Yükleniyor...</span>
+    </header>
+
+    <main>
+      <section>
+        <h2>Kaynaklar</h2>
+        <ul id="sourceList"></ul>
+      </section>
+
+      <section>
+        <h2>Güncel Başlıklar</h2>
+        <div id="newsList" class="news-grid"></div>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
