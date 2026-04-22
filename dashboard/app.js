@@ -1,9 +1,9 @@
 const playerStatsEl = document.getElementById("playerStats");
 const enemyStatsEl = document.getElementById("enemyStats");
 const equipmentInfoEl = document.getElementById("equipmentInfo");
-const inventoryListEl = document.getElementById("inventoryList");
-const shopListEl = document.getElementById("shopList");
 const battleLogEl = document.getElementById("battleLog");
+const arenaStatusEl = document.getElementById("arenaStatus");
+const arenaProgressBarEl = document.getElementById("arenaProgressBar");
 
 const attackBtn = document.getElementById("attackBtn");
 const defendBtn = document.getElementById("defendBtn");
@@ -11,82 +11,111 @@ const castBtn = document.getElementById("castBtn");
 const itemBtn = document.getElementById("itemBtn");
 const nextEnemyBtn = document.getElementById("nextEnemyBtn");
 
-const weaponSelect = document.getElementById("weaponSelect");
-const shieldSelect = document.getElementById("shieldSelect");
 const spellSelect = document.getElementById("spellSelect");
 const itemSelect = document.getElementById("itemSelect");
 
-const weapons = [
-  { id: "bronze", name: "Bronz Kılıç", min: 6, max: 10, crit: 0.1, price: 0 },
-  { id: "steel", name: "Çelik Gladius", min: 9, max: 14, crit: 0.15, price: 60 },
-  { id: "myth", name: "Mistik Claymore", min: 12, max: 18, crit: 0.2, price: 120 },
+const swordShopEl = document.getElementById("swordShop");
+const armorShopEl = document.getElementById("armorShop");
+const orbShopEl = document.getElementById("orbShop");
+
+const swords = [
+  { id: "bronze", name: "Bronz Kılıç", power: 9, crit: 0.05, price: 0 },
+  { id: "steel", name: "Çelik Kılıç", power: 12, crit: 0.08, price: 110 },
+  { id: "obsidian", name: "Obsidyen Kılıç", power: 15, crit: 0.1, price: 260 },
+  { id: "royal", name: "Kraliyet Kılıcı", power: 19, crit: 0.12, price: 480 },
+  { id: "legend", name: "Efsane Kılıç", power: 24, crit: 0.14, price: 760 },
 ];
 
-const shields = [
-  { id: "wood", name: "Ahşap Kalkan", block: 2, price: 0 },
-  { id: "iron", name: "Demir Kalkan", block: 4, price: 70 },
-  { id: "tower", name: "Kule Kalkan", block: 6, price: 140 },
+const armors = [
+  { id: "leather", name: "Deri Zırh", block: 3, hpBonus: 0, price: 0 },
+  { id: "chain", name: "Zincir Zırh", block: 5, hpBonus: 10, price: 130 },
+  { id: "plate", name: "Plaka Zırh", block: 7, hpBonus: 24, price: 300 },
+  { id: "imperial", name: "İmparator Zırhı", block: 9, hpBonus: 40, price: 540 },
+  { id: "aegis", name: "Aegis Zırh", block: 12, hpBonus: 60, price: 820 },
+];
+
+const orbs = [
+  { id: "ember", name: "Köz Küresi", mana: 14, scale: 1.0, bonus: 5, price: 90 },
+  { id: "frost", name: "Buz Küresi", mana: 16, scale: 1.05, bonus: 7, slow: 1, price: 220 },
+  { id: "storm", name: "Fırtına Küresi", mana: 20, scale: 1.15, bonus: 9, price: 430 },
+  { id: "solar", name: "Güneş Küresi", mana: 24, scale: 1.3, bonus: 12, price: 700 },
 ];
 
 const spells = [
-  { id: "fire", name: "Ateş Topu", mana: 18, damage: [14, 24] },
-  { id: "ice", name: "Buz Mızrağı", mana: 14, damage: [10, 18], debuff: 2 },
-  { id: "heal", name: "Işık Şifası", mana: 16, heal: [12, 20] },
+  { id: "slashRune", name: "Kesik Rünü", type: "damage", base: 10, mana: 10 },
+  { id: "regenRune", name: "Yenileme Rünü", type: "heal", base: 16, mana: 14 },
+  { id: "focusRune", name: "Odak Rünü", type: "buff", mana: 12, attackBuff: 4 },
 ];
 
-const itemCatalog = [
-  { id: "smallPotion", name: "Küçük Can İksiri", amount: 25, count: 2, price: 20 },
-  { id: "manaPotion", name: "Mana İksiri", mana: 20, count: 1, price: 25 },
-  { id: "bomb", name: "Arena Bombası", damage: 22, count: 1, price: 35 },
+const items = [
+  { id: "hpPotion", name: "Can İksiri", heal: 28, count: 3, price: 35 },
+  { id: "manaPotion", name: "Mana İksiri", mana: 22, count: 2, price: 35 },
 ];
+
+const enemyNames = Array.from({ length: 100 }, (_, i) => `Arena Rakibi #${i + 1}`);
 
 const player = {
   level: 1,
   exp: 0,
-  gold: 100,
-  maxHp: 120,
-  hp: 120,
-  maxMana: 70,
-  mana: 70,
-  defenseBuff: 0,
-  ownedWeapons: ["bronze"],
-  ownedShields: ["wood"],
-  items: structuredClone(itemCatalog),
-  weaponId: "bronze",
-  shieldId: "wood",
+  gold: 200,
+  baseMaxHp: 140,
+  maxHp: 140,
+  hp: 140,
+  maxMana: 80,
+  mana: 80,
+  tempDefense: 0,
+  tempAttack: 0,
+  ownedSwords: ["bronze"],
+  ownedArmors: ["leather"],
+  ownedOrbs: ["ember"],
+  swordId: "bronze",
+  armorId: "leather",
+  orbId: "ember",
+  inventory: structuredClone(items),
 };
 
-let enemy = createEnemy(1);
+let enemyIndex = 0;
+let enemy = createEnemy(enemyIndex);
 
-function createEnemy(level) {
-  const hp = 80 + level * 20;
+function createEnemy(index) {
+  const tier = index + 1;
   return {
-    name: `Arena Savaşçısı Lv.${level}`,
-    hp,
-    maxHp: hp,
-    minAttack: 8 + level * 2,
-    maxAttack: 12 + level * 3,
-    armor: 2 + level,
-    slowTurns: 0,
+    name: enemyNames[index],
+    hp: 100 + tier * 7,
+    maxHp: 100 + tier * 7,
+    attack: 11 + Math.floor(tier * 0.7),
+    defense: 3 + Math.floor(tier * 0.4),
+    slowTurn: 0,
   };
 }
 
-function rand(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+function getSword() {
+  return swords.find((s) => s.id === player.swordId);
 }
 
-function selectedWeapon() {
-  return weapons.find((w) => w.id === player.weaponId);
+function getArmor() {
+  return armors.find((a) => a.id === player.armorId);
 }
 
-function selectedShield() {
-  return shields.find((s) => s.id === player.shieldId);
+function getOrb() {
+  return orbs.find((o) => o.id === player.orbId);
 }
 
-function addLog(message) {
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function addLog(text) {
   const li = document.createElement("li");
-  li.textContent = message;
+  li.textContent = text;
   battleLogEl.prepend(li);
+}
+
+function balancedAttack(attackerPower, defenderArmor, swing = 0.08) {
+  const randomFactor = 1 + (Math.random() * 2 - 1) * swing;
+  const raw = attackerPower * randomFactor;
+  const mitigated = raw * (100 / (100 + defenderArmor * 6));
+  return Math.max(1, Math.round(mitigated));
 }
 
 function renderStats() {
@@ -95,150 +124,254 @@ function renderStats() {
     <div class="stat-card">Can: ${player.hp}/${player.maxHp}</div>
     <div class="stat-card">Mana: ${player.mana}/${player.maxMana}</div>
     <div class="stat-card">Altın: ${player.gold}</div>
-    <div class="stat-card">Deneyim: ${player.exp}/100</div>
+    <div class="stat-card">XP: ${player.exp}/120</div>
   `;
 
   enemyStatsEl.innerHTML = `
     <div class="stat-card">${enemy.name}</div>
     <div class="stat-card">Can: ${enemy.hp}/${enemy.maxHp}</div>
-    <div class="stat-card">Zırh: ${enemy.armor}</div>
-    <div class="stat-card">Yavaşlatma: ${enemy.slowTurns} tur</div>
+    <div class="stat-card">Saldırı: ${enemy.attack}</div>
+    <div class="stat-card">Savunma: ${enemy.defense}</div>
   `;
 
-  const weapon = selectedWeapon();
-  const shield = selectedShield();
+  const sword = getSword();
+  const armor = getArmor();
+  const orb = getOrb();
+
   equipmentInfoEl.innerHTML = `
-    <div class="stat-card">Silah: ${weapon.name} (${weapon.min}-${weapon.max})</div>
-    <div class="stat-card">Kalkan: ${shield.name} (Blok ${shield.block})</div>
+    <div class="stat-card">Kılıç: ${sword.name} (+${sword.power} güç, kritik ${Math.round(sword.crit * 100)}%)</div>
+    <div class="stat-card">Zırh: ${armor.name} (+${armor.block} blok, +${armor.hpBonus} can)</div>
+    <div class="stat-card">Küre: ${orb.name} (mana ${orb.mana}, büyü çarpanı x${orb.scale})</div>
   `;
+
+  const progress = ((enemyIndex + (enemy.hp <= 0 ? 1 : 0)) / 100) * 100;
+  arenaProgressBarEl.style.width = `${clamp(progress, 0, 100)}%`;
+  arenaStatusEl.innerHTML = `<strong>${enemyIndex + 1}/100</strong> rakip dövüşü`;
 }
 
 function renderSelectors() {
-  weaponSelect.innerHTML = weapons
-    .filter((w) => player.ownedWeapons.includes(w.id))
-    .map((w) => `<option value="${w.id}" ${player.weaponId === w.id ? "selected" : ""}>${w.name}</option>`)
-    .join("");
-
-  shieldSelect.innerHTML = shields
-    .filter((s) => player.ownedShields.includes(s.id))
-    .map((s) => `<option value="${s.id}" ${player.shieldId === s.id ? "selected" : ""}>${s.name}</option>`)
-    .join("");
-
   spellSelect.innerHTML = spells.map((s) => `<option value="${s.id}">${s.name} (${s.mana} mana)</option>`).join("");
-
-  itemSelect.innerHTML = player.items
-    .map((i) => `<option value="${i.id}">${i.name} x${i.count}</option>`)
-    .join("");
+  itemSelect.innerHTML = player.inventory.map((i) => `<option value="${i.id}">${i.name} x${i.count}</option>`).join("");
 }
 
-function renderInventory() {
-  inventoryListEl.innerHTML = "";
-  player.items.forEach((item) => {
-    const row = document.createElement("div");
-    row.className = "row";
-    row.innerHTML = `<span>${item.name}</span><strong>x${item.count}</strong>`;
-    inventoryListEl.appendChild(row);
-  });
+function shopRow(item, onBuy, owned) {
+  const row = document.createElement("div");
+  row.className = "shop-row";
 
-  const shopEntries = [
-    ...weapons.filter((w) => !player.ownedWeapons.includes(w.id)).map((w) => ({ type: "weapon", ...w })),
-    ...shields.filter((s) => !player.ownedShields.includes(s.id)).map((s) => ({ type: "shield", ...s })),
-    ...itemCatalog.map((i) => ({ type: "item", ...i })),
-  ];
+  const left = document.createElement("span");
+  left.textContent = `${item.name} - ${item.price} altın`;
 
-  shopListEl.innerHTML = "";
-  shopEntries.forEach((entry) => {
-    const row = document.createElement("div");
-    row.className = "row";
-
-    const button = document.createElement("button");
-    button.textContent = `Satın Al (${entry.price} altın)`;
-    button.disabled = player.gold < entry.price;
-    button.addEventListener("click", () => buyEntry(entry));
-
-    row.innerHTML = `<span>${entry.name}</span>`;
-    row.appendChild(button);
-    shopListEl.appendChild(row);
-  });
-}
-
-function buyEntry(entry) {
-  if (player.gold < entry.price) {
-    addLog("Yetersiz altın!");
-    return;
-  }
-
-  player.gold -= entry.price;
-  if (entry.type === "weapon") {
-    player.ownedWeapons.push(entry.id);
-    player.weaponId = entry.id;
-    addLog(`${entry.name} satın alındı ve kuşanıldı.`);
-  } else if (entry.type === "shield") {
-    player.ownedShields.push(entry.id);
-    player.shieldId = entry.id;
-    addLog(`${entry.name} satın alındı ve takıldı.`);
+  const button = document.createElement("button");
+  if (owned) {
+    button.textContent = "Kuşan";
   } else {
-    const item = player.items.find((i) => i.id === entry.id);
-    if (item) {
-      item.count += 1;
-    }
-    addLog(`${entry.name} satın alındı.`);
+    button.textContent = "Satın Al";
   }
+  button.disabled = !owned && player.gold < item.price;
+  button.addEventListener("click", onBuy);
 
-  rerender();
+  row.append(left, button);
+  return row;
 }
 
-function damageEnemy(amount) {
-  const mitigated = Math.max(1, amount - enemy.armor);
-  enemy.hp = Math.max(0, enemy.hp - mitigated);
-  return mitigated;
+function renderShops() {
+  swordShopEl.innerHTML = "";
+  swords.forEach((sword) => {
+    const owned = player.ownedSwords.includes(sword.id);
+    swordShopEl.appendChild(
+      shopRow(
+        sword,
+        () => {
+          if (!owned) {
+            player.gold -= sword.price;
+            player.ownedSwords.push(sword.id);
+            addLog(`${sword.name} satın alındı.`);
+          }
+          player.swordId = sword.id;
+          addLog(`${sword.name} kuşanıldı.`);
+          rerender();
+        },
+        owned
+      )
+    );
+  });
+
+  armorShopEl.innerHTML = "";
+  armors.forEach((armor) => {
+    const owned = player.ownedArmors.includes(armor.id);
+    armorShopEl.appendChild(
+      shopRow(
+        armor,
+        () => {
+          if (!owned) {
+            player.gold -= armor.price;
+            player.ownedArmors.push(armor.id);
+            addLog(`${armor.name} satın alındı.`);
+          }
+          player.armorId = armor.id;
+          recalcMaxHp();
+          addLog(`${armor.name} giyildi.`);
+          rerender();
+        },
+        owned
+      )
+    );
+  });
+
+  orbShopEl.innerHTML = "";
+  orbs.forEach((orb) => {
+    const owned = player.ownedOrbs.includes(orb.id);
+    orbShopEl.appendChild(
+      shopRow(
+        orb,
+        () => {
+          if (!owned) {
+            player.gold -= orb.price;
+            player.ownedOrbs.push(orb.id);
+            addLog(`${orb.name} satın alındı.`);
+          }
+          player.orbId = orb.id;
+          addLog(`${orb.name} takıldı.`);
+          rerender();
+        },
+        owned
+      )
+    );
+  });
+}
+
+function recalcMaxHp() {
+  const armor = getArmor();
+  const oldMax = player.maxHp;
+  player.maxHp = player.baseMaxHp + armor.hpBonus + player.level * 8;
+  player.hp = clamp(player.hp + (player.maxHp - oldMax), 1, player.maxHp);
+}
+
+function gainRewards() {
+  const tier = enemyIndex + 1;
+  const goldGain = 28 + tier * 4;
+  const expGain = 26 + tier * 3;
+  player.gold += goldGain;
+  player.exp += expGain;
+  addLog(`Kazandın! +${goldGain} altın, +${expGain} XP.`);
+
+  while (player.exp >= 120) {
+    player.exp -= 120;
+    player.level += 1;
+    player.baseMaxHp += 5;
+    player.maxMana += 4;
+    recalcMaxHp();
+    player.hp = player.maxHp;
+    player.mana = player.maxMana;
+    addLog(`Seviye atladın! (${player.level})`);
+  }
 }
 
 function enemyTurn() {
   if (enemy.hp <= 0) {
-    winFight();
+    gainRewards();
+    disableCombat(true);
+    rerender();
     return;
   }
 
-  const shield = selectedShield();
-  const slowPenalty = enemy.slowTurns > 0 ? 3 : 0;
-  enemy.slowTurns = Math.max(0, enemy.slowTurns - 1);
+  const armor = getArmor();
+  const slowPenalty = enemy.slowTurn > 0 ? 3 : 0;
+  enemy.slowTurn = Math.max(0, enemy.slowTurn - 1);
 
-  const rawDamage = rand(enemy.minAttack - slowPenalty, enemy.maxAttack - slowPenalty);
-  const blocked = shield.block + player.defenseBuff;
-  player.defenseBuff = 0;
+  const enemyPower = enemy.attack - slowPenalty;
+  const blockedArmor = armor.block + player.tempDefense;
+  const damage = balancedAttack(enemyPower, blockedArmor);
 
-  const dealt = Math.max(1, rawDamage - blocked);
-  player.hp = Math.max(0, player.hp - dealt);
-  addLog(`Rakip ${dealt} hasar verdi.`);
+  player.hp = clamp(player.hp - damage, 0, player.maxHp);
+  player.tempDefense = 0;
+  addLog(`Rakip ${damage} hasar vurdu.`);
 
   if (player.hp <= 0) {
-    addLog("Yenildin! Yeni rakip ile tekrar dene.");
+    addLog("Yenildin. Aynı rakiple tekrar deneyebilirsin.");
     disableCombat(true);
   }
 
   rerender();
 }
 
-function winFight() {
-  const rewardGold = 25 + player.level * 8;
-  const rewardExp = 35 + player.level * 10;
-  player.gold += rewardGold;
-  player.exp += rewardExp;
-  addLog(`Zafer! +${rewardGold} altın, +${rewardExp} deneyim.`);
+function actionAttack() {
+  const sword = getSword();
+  const basePower = sword.power + player.level * 2 + player.tempAttack;
+  const crit = Math.random() < sword.crit;
+  const hitPower = crit ? basePower * 1.45 : basePower;
+  const damage = balancedAttack(hitPower, enemy.defense);
 
-  while (player.exp >= 100) {
-    player.exp -= 100;
-    player.level += 1;
-    player.maxHp += 12;
-    player.maxMana += 8;
-    player.hp = player.maxHp;
-    player.mana = player.maxMana;
-    addLog(`Seviye atladın! Yeni seviye: ${player.level}`);
+  enemy.hp = clamp(enemy.hp - damage, 0, enemy.maxHp);
+  addLog(`Saldırı ${damage} hasar verdi${crit ? " (kritik)" : ""}.`);
+  player.tempAttack = 0;
+  rerender();
+  enemyTurn();
+}
+
+function actionDefend() {
+  player.tempDefense = 8;
+  addLog("Savunma açıldı: +8 blok (1 tur). ");
+  enemyTurn();
+}
+
+function actionCast() {
+  const selected = spells.find((s) => s.id === spellSelect.value);
+  const orb = getOrb();
+
+  if (!selected) return;
+  if (player.mana < selected.mana) {
+    addLog("Yetersiz mana.");
+    return;
   }
 
-  disableCombat(true);
+  player.mana -= selected.mana;
+
+  if (selected.type === "damage") {
+    const spellPower = (selected.base + player.level * 2 + orb.bonus) * orb.scale;
+    const damage = balancedAttack(spellPower, enemy.defense, 0.06);
+    enemy.hp = clamp(enemy.hp - damage, 0, enemy.maxHp);
+    addLog(`${selected.name} ${damage} hasar verdi.`);
+    if (orb.slow) {
+      enemy.slowTurn = Math.max(enemy.slowTurn, orb.slow);
+      addLog("Küre etkisi: Rakip yavaşladı.");
+    }
+  }
+
+  if (selected.type === "heal") {
+    const heal = Math.round((selected.base + orb.bonus / 2) * orb.scale);
+    player.hp = clamp(player.hp + heal, 0, player.maxHp);
+    addLog(`${selected.name} ile ${heal} can yeniledin.`);
+  }
+
+  if (selected.type === "buff") {
+    player.tempAttack = selected.attackBuff + Math.round(orb.bonus / 3);
+    addLog(`Bir sonraki saldırıya +${player.tempAttack} güç eklendi.`);
+  }
+
   rerender();
+  enemyTurn();
+}
+
+function actionUseItem() {
+  const chosen = player.inventory.find((i) => i.id === itemSelect.value);
+  if (!chosen || chosen.count <= 0) {
+    addLog("İksir kalmadı.");
+    return;
+  }
+
+  chosen.count -= 1;
+  if (chosen.heal) {
+    player.hp = clamp(player.hp + chosen.heal, 0, player.maxHp);
+    addLog(`${chosen.name} kullanıldı: +${chosen.heal} can.`);
+  }
+  if (chosen.mana) {
+    player.mana = clamp(player.mana + chosen.mana, 0, player.maxMana);
+    addLog(`${chosen.name} kullanıldı: +${chosen.mana} mana.`);
+  }
+
+  rerender();
+  enemyTurn();
 }
 
 function disableCombat(disabled) {
@@ -247,105 +380,42 @@ function disableCombat(disabled) {
   });
 }
 
-function actionAttack() {
-  const weapon = selectedWeapon();
-  let dmg = rand(weapon.min, weapon.max);
-  const crit = Math.random() < weapon.crit;
-  if (crit) dmg *= 2;
+function nextEnemy() {
+  if (player.hp <= 0) {
+    player.hp = Math.round(player.maxHp * 0.75);
+    player.mana = Math.round(player.maxMana * 0.75);
+    addLog("Dövüş öncesi toparlandın (%75). ");
+  }
 
-  const dealt = damageEnemy(dmg);
-  addLog(`Saldırın ${dealt} hasar verdi${crit ? " (kritik!)" : ""}.`);
-  rerender();
-  enemyTurn();
-}
-
-function actionDefend() {
-  player.defenseBuff = 6;
-  addLog("Savunma pozisyonu aldın, bu tur ekstra blok aktif.");
-  enemyTurn();
-}
-
-function actionCast() {
-  const spell = spells.find((s) => s.id === spellSelect.value);
-  if (!spell) return;
-  if (player.mana < spell.mana) {
-    addLog("Yetersiz mana.");
+  if (enemy.hp > 0 && enemyIndex < 99) {
+    addLog("Önce mevcut rakibi bitirmelisin.");
     return;
   }
 
-  player.mana -= spell.mana;
-
-  if (spell.heal) {
-    const healValue = rand(spell.heal[0], spell.heal[1]);
-    player.hp = Math.min(player.maxHp, player.hp + healValue);
-    addLog(`${spell.name} ile ${healValue} can yeniledin.`);
-  } else {
-    const base = rand(spell.damage[0], spell.damage[1]);
-    const dealt = damageEnemy(base);
-    addLog(`${spell.name} ${dealt} hasar verdi.`);
-    if (spell.debuff) {
-      enemy.slowTurns = Math.max(enemy.slowTurns, spell.debuff);
-      addLog("Rakip yavaşlatıldı.");
-    }
-  }
-
-  rerender();
-  enemyTurn();
-}
-
-function actionUseItem() {
-  const item = player.items.find((i) => i.id === itemSelect.value);
-  if (!item || item.count <= 0) {
-    addLog("Bu eşyadan kalmadı.");
+  if (enemyIndex >= 99 && enemy.hp <= 0) {
+    addLog("Tebrikler! 100 rakibin tamamını yendin.");
+    nextEnemyBtn.disabled = true;
     return;
   }
 
-  item.count -= 1;
-  if (item.amount) {
-    player.hp = Math.min(player.maxHp, player.hp + item.amount);
-    addLog(`${item.name} kullandın, ${item.amount} can kazandın.`);
-  }
-  if (item.mana) {
-    player.mana = Math.min(player.maxMana, player.mana + item.mana);
-    addLog(`${item.name} kullandın, ${item.mana} mana kazandın.`);
-  }
-  if (item.damage) {
-    const dealt = damageEnemy(item.damage);
-    addLog(`${item.name} patladı, ${dealt} hasar verdi.`);
-  }
-
-  rerender();
-  enemyTurn();
-}
-
-function spawnNextEnemy() {
-  enemy = createEnemy(player.level + rand(0, 1));
+  enemyIndex += enemy.hp <= 0 ? 1 : 0;
+  enemy = createEnemy(enemyIndex);
   disableCombat(false);
-  addLog(`${enemy.name} arenaya çıktı!`);
+  addLog(`${enemy.name} arenaya çıktı.`);
   rerender();
 }
 
 function rerender() {
   renderStats();
   renderSelectors();
-  renderInventory();
+  renderShops();
 }
-
-weaponSelect.addEventListener("change", (e) => {
-  player.weaponId = e.target.value;
-  rerender();
-});
-
-shieldSelect.addEventListener("change", (e) => {
-  player.shieldId = e.target.value;
-  rerender();
-});
 
 attackBtn.addEventListener("click", actionAttack);
 defendBtn.addEventListener("click", actionDefend);
 castBtn.addEventListener("click", actionCast);
 itemBtn.addEventListener("click", actionUseItem);
-nextEnemyBtn.addEventListener("click", spawnNextEnemy);
+nextEnemyBtn.addEventListener("click", nextEnemy);
 
-addLog("Arena hazır. İlk hamleni yap!");
+addLog("Arena hazır. 100 rakip seni bekliyor!");
 rerender();
