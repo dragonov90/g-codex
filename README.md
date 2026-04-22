@@ -1,7 +1,3 @@
-# Zonguldak Haber
-
-Zonguldak şehrindeki haberleri günlük ve anlık takip edebilmeniz için **Android uygulaması** ve **Windows üzerinden kontrol edebileceğiniz web paneli** içeren bir başlangıç projesidir.
-
 ## Proje Yapısı
 - `android-app/`: Android uygulaması (Kotlin + RecyclerView)
 - `dashboard/`: Windows'ta tarayıcı üzerinden çalıştırılacak web paneli
