@@ -3,28 +3,70 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Zonguldak Haber Paneli</title>
+    <title>Sword & Sandals - 100 Savaşçı Arenası</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Zonguldak Haber Paneli</h1>
-      <p>Windows üzerinden haber kaynaklarını ve güncel başlıkları takip edin.</p>
-      <button id="refreshButton">Yenile</button>
-      <span id="statusText">Yükleniyor...</span>
-    </header>
+    <div class="app-shell">
+      <header class="hero">
+        <h1>⚔️ Sword & Sandals: 100 Savaşçı Arenası</h1>
+        <p>100 karakteri tek tek yen, ekipmanlarını geliştir ve efsane ol.</p>
+      </header>
 
-    <main>
-      <section>
-        <h2>Kaynaklar</h2>
-        <ul id="sourceList"></ul>
-      </section>
+      <main class="grid">
+        <section class="panel arena-stage">
+          <h2>Arena Sahası</h2>
+          <div id="arenaStatus"></div>
+          <div class="arena-progress">
+            <div id="arenaProgressBar"></div>
+          </div>
+          <button id="nextEnemyBtn" class="secondary">Sonraki Dövüşe Geç</button>
+        </section>
 
-      <section>
-        <h2>Güncel Başlıklar</h2>
-        <div id="newsList" class="news-grid"></div>
-      </section>
-    </main>
+        <section class="panel" id="playerPanel">
+          <h2>Gladyatör</h2>
+          <div class="stats" id="playerStats"></div>
+          <div class="equipment" id="equipmentInfo"></div>
+        </section>
+
+        <section class="panel" id="enemyPanel">
+          <h2>Rakip</h2>
+          <div class="stats" id="enemyStats"></div>
+        </section>
+
+        <section class="panel controls">
+          <h2>Aksiyonlar</h2>
+          <div class="button-row">
+            <button id="attackBtn">Saldır</button>
+            <button id="defendBtn">Savun</button>
+            <button id="castBtn">Sihir</button>
+            <button id="itemBtn">İksir</button>
+          </div>
+          <label>Sihir Seçimi <select id="spellSelect"></select></label>
+          <label>İksir Seçimi <select id="itemSelect"></select></label>
+        </section>
+
+        <section class="panel shop-panel">
+          <h2>Kılıç Dükkanı</h2>
+          <div id="swordShop"></div>
+        </section>
+
+        <section class="panel shop-panel">
+          <h2>Zırh Dükkanı</h2>
+          <div id="armorShop"></div>
+        </section>
+
+        <section class="panel shop-panel">
+          <h2>Sihir Küreleri Dükkanı</h2>
+          <div id="orbShop"></div>
+        </section>
+
+        <section class="panel log-panel">
+          <h2>Savaş Günlüğü</h2>
+          <ul id="battleLog"></ul>
+        </section>
+      </main>
+    </div>
 
     <script src="app.js"></script>
   </body>
