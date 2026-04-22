@@ -3,28 +3,70 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Zonguldak Haber Paneli</title>
+    <title>Gladyatör Arenası</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Zonguldak Haber Paneli</h1>
-      <p>Windows üzerinden haber kaynaklarını ve güncel başlıkları takip edin.</p>
-      <button id="refreshButton">Yenile</button>
-      <span id="statusText">Yükleniyor...</span>
-    </header>
+    <div class="app-shell">
+      <header class="hero">
+        <h1>⚔️ Sword & Sandals: Arena Reborn</h1>
+        <p>Modern arayüzlü sıra tabanlı dövüş: silah, kalkan, sihir ve eşya yönetimi.</p>
+      </header>
 
-    <main>
-      <section>
-        <h2>Kaynaklar</h2>
-        <ul id="sourceList"></ul>
-      </section>
+      <main class="grid">
+        <section class="panel" id="playerPanel">
+          <h2>Oyuncu</h2>
+          <div class="stats" id="playerStats"></div>
+          <div class="equipment" id="equipmentInfo"></div>
+        </section>
 
-      <section>
-        <h2>Güncel Başlıklar</h2>
-        <div id="newsList" class="news-grid"></div>
-      </section>
-    </main>
+        <section class="panel" id="enemyPanel">
+          <h2>Rakip</h2>
+          <div class="stats" id="enemyStats"></div>
+        </section>
+
+        <section class="panel controls">
+          <h2>Aksiyonlar</h2>
+          <div class="button-row">
+            <button id="attackBtn">Saldır</button>
+            <button id="defendBtn">Savun</button>
+            <button id="castBtn">Sihir Kullan</button>
+            <button id="itemBtn">Eşya Kullan</button>
+          </div>
+          <div class="selectors">
+            <label>
+              Silah
+              <select id="weaponSelect"></select>
+            </label>
+            <label>
+              Kalkan
+              <select id="shieldSelect"></select>
+            </label>
+            <label>
+              Sihir
+              <select id="spellSelect"></select>
+            </label>
+            <label>
+              Eşya
+              <select id="itemSelect"></select>
+            </label>
+          </div>
+          <button id="nextEnemyBtn" class="secondary">Yeni Rakip</button>
+        </section>
+
+        <section class="panel inventory">
+          <h2>Envanter</h2>
+          <div id="inventoryList"></div>
+          <h3>Dükkan</h3>
+          <div id="shopList"></div>
+        </section>
+
+        <section class="panel log-panel">
+          <h2>Savaş Günlüğü</h2>
+          <ul id="battleLog"></ul>
+        </section>
+      </main>
+    </div>
 
     <script src="app.js"></script>
   </body>
